@@ -129,8 +129,54 @@ void vigenere_decrypt(char range_low, char range_high, const char * key, const c
 
 /** TODO
  */
-int cli(int argc, char ** argv);
+/** Command Line Interface function for encryption and decryption.
+  *
+  * \param argc The number of arguments
+  * \param argv An array of argument strings
+  * \return 0 on success, 1 on failure
+  */
+int cli(int argc, char **argv) {
+    if (argc != 4) {
+        fprintf(stderr, "Error: Invalid number of arguments.\n");
+        return 1;
+    }
 
+    const char *operation = argv[1];
+    const char *key = argv[2];
+    const char *message = argv[3];
+
+    if (strcmp(operation, "caesar-encrypt") == 0 || strcmp(operation, "caesar-decrypt") == 0) {
+        char *endptr;
+        int shift = strtol(key, &endptr, 10);
+        if (*endptr != '\0') {
+            fprintf(stderr, "Error: Invalid key for Caesar cipher. Must be an integer.\n");
+            return 1;
+        }
+
+        char output[256];
+        if (strcmp(operation, "caesar-encrypt") == 0) {
+            caesar_encrypt(shift, message, output);
+        } else {
+            caesar_decrypt(shift, message, output);
+        }
+        printf("%s\n", output);
+        return 0;
+
+    } else if (strcmp(operation, "vigenere-encrypt") == 0 || strcmp(operation, "vigenere-decrypt") == 0) {
+        char output[256];
+        if (strcmp(operation, "vigenere-encrypt") == 0) {
+            vigenere_encrypt('A', 'Z', key, message, output);
+        } else {
+            vigenere_decrypt('A', 'Z', key, message, output);
+        }
+        printf("%s\n", output);
+        return 0;
+
+    } else {
+        fprintf(stderr, "Error: Invalid operation. Must be one of: caesar-encrypt, caesar-decrypt, vigenere-encrypt, vigenere-decrypt.\n");
+        return 1;
+    }
+}
 
 #endif
 // CRYPTO_H
